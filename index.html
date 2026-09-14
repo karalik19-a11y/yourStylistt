@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>yourStylist</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.160.0/build/three.module.js"}}</script>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070313;--vio:#a78bfa;--pink:#f0abfc;--mint:#99f6e4;--card:rgba(255,255,255,.08);--stroke:rgba(255,255,255,.14)}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:#fff;font-family:Manrope,sans-serif;min-height:100vh;overflow-x:hidden}
+h1,h2,.uni{font-family:Unbounded,sans-serif}
+.neb{position:fixed;border-radius:50%;filter:blur(90px);opacity:.55;z-index:0;animation:float 12s ease-in-out infinite alternate}
+.n1{width:420px;height:420px;background:radial-gradient(circle,#7c3aed,transparent 70%);top:-120px;left:-100px}
+.n2{width:380px;height:380px;background:radial-gradient(circle,#ec4899,transparent 70%);top:30%;right:-140px;animation-delay:-4s}
+.n3{width:420px;height:420px;background:radial-gradient(circle,#22d3ee,transparent 70%);bottom:-150px;left:20%;animation-delay:-8s}
+@keyframes float{to{transform:translateY(40px) scale(1.1)}}
+.stars{position:fixed;inset:0;z-index:0;background-image:radial-gradient(1px 1px at 20% 30%,#fff,transparent),radial-gradient(1.5px 1.5px at 70% 20%,#fff,transparent),radial-gradient(1px 1px at 40% 80%,#fff,transparent),radial-gradient(1px 1px at 90% 60%,#fff,transparent);opacity:.7}
+#app{position:relative;z-index:1;max-width:480px;margin:0 auto;padding:18px 16px 40px}
+header{display:flex;align-items:center;gap:12px;margin:8px 0 16px}
+.logo{width:48px;height:48px;border-radius:16px;background:linear-gradient(135deg,#a78bfa,#f0abfc,#99f6e4);display:grid;place-items:center;font-size:24px;box-shadow:0 0 30px #a78bfa88}
+header h1{font-size:20px;margin:0;background:linear-gradient(90deg,#fff,#f0abfc,#99f6e4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+header p{margin:2px 0 0;font-size:12px;opacity:.7}
+.screen{display:none;animation:fade .5s ease}
+.screen.active{display:block}
+@keyframes fade{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+.glass{background:var(--card);border:1px solid var(--stroke);backdrop-filter:blur(20px);border-radius:24px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,.35);margin-bottom:12px}
+.btn{width:100%;border:0;border-radius:18px;padding:16px;font-family:Unbounded;font-weight:600;font-size:15px;color:#0b0618;background:linear-gradient(90deg,var(--mint),var(--pink),var(--vio));cursor:pointer;transition:.3s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:transparent;color:#fff;border:1px solid var(--stroke)}
+.btn.white{background:#fff}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.chip{padding:10px 14px;border-radius:100px;background:rgba(255,255,255,.07);border:1px solid var(--stroke);font-size:13px;font-weight:700;cursor:pointer;transition:.25s}
+.chip.active{background:linear-gradient(90deg,#a78bfa,#f0abfc);color:#0b0618;border-color:transparent;box-shadow:0 0 20px #a78bfa88}
+label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.7;font-weight:800}
+input[type=range]{width:100%;accent-color:#f0abfc}
+.val{font-family:Unbounded;font-size:14px}
+.rec{font-size:12px;color:var(--mint);font-weight:800;margin:4px 0;text-transform:none;letter-spacing:0}
+.photoBox{border:2px dashed rgba(240,171,252,.5);border-radius:20px;padding:18px;text-align:center;cursor:pointer;background:rgba(167,139,250,.08)}
+.photoBox img{width:110px;height:110px;object-fit:cover;border-radius:50%;border:3px solid #f0abfc}
+.ticker{white-space:nowrap;overflow:hidden;border-radius:14px;background:rgba(0,0,0,.4);border:1px solid var(--stroke);padding:10px;margin-top:12px;font-size:12px}
+.ticker span{display:inline-block;animation:tick 22s linear infinite}
+@keyframes tick{to{transform:translateX(-50%)}}
+.trend{font-size:12px;background:rgba(0,0,0,.35);border:1px solid var(--stroke);border-radius:14px;padding:10px 12px;margin:6px 0}
+.item{display:flex;gap:12px;background:rgba(255,255,255,.06);border:1px solid var(--stroke);border-radius:18px;padding:12px;margin:10px 0}
+.dot{width:44px;height:44px;border-radius:14px;flex-shrink:0;border:1px solid #ffffff33}
+.item b{font-size:13px}.item small{opacity:.75;font-size:12px;line-height:1.4;display:block;margin:4px 0}
+.price{font-family:Unbounded;font-size:13px;color:var(--mint)}
+.link{font-size:12px;color:#0b0618;background:#fff;border-radius:100px;padding:6px 12px;text-decoration:none;font-weight:800;display:inline-block;margin:6px 6px 0 0}
+.link.pz{background:linear-gradient(90deg,#99f6e4,#f0abfc)}
+#c3d{width:100%;height:360px;border-radius:20px;background:radial-gradient(ellipse at center,#1e1b4b 0%,#070313 70%);touch-action:none}
+.bar{height:10px;background:#ffffff18;border-radius:100px;overflow:hidden}
+.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--mint),var(--pink));border-radius:100px;transition:1s}
+.load{text-align:center;padding:40px 10px}.orb{width:90px;height:90px;margin:0 auto 18px;border-radius:50%;background:conic-gradient(from 0deg,#a78bfa,#f0abfc,#22d3ee,#a78bfa);animation:spin 1.2s linear infinite;box-shadow:0 0 50px #a78bfa}.orb:after{content:'';display:block;width:70px;height:70px;background:#0b0618;border-radius:50%;margin:10px}@keyframes spin{to{transform:rotate(360deg)}}
+.row{display:flex;gap:10px}.row>div{flex:1}
+.live-dot{width:8px;height:8px;background:#4ade80;border-radius:50%;display:inline-block;margin-right:6px;box-shadow:0 0 10px #4ade80}
+</style>
+</head>
+<body>
+<div class="neb n1"></div><div class="neb n2"></div><div class="neb n3"></div><div class="stars"></div>
+<div id="app">
+<header><div class="logo">✦</div><div><h1>yourStylist</h1><p>cosmic AI стилист • v2 + размеры + Avito</p></div></header>
+
+<div id="s1" class="screen active">
+<div class="glass"><h2 style="margin:0 0 8px;font-size:22px;line-height:1.2">Соберу образ<br>под тело, лицо<br>и вайб ✧</h2>
+<p style="opacity:.8;font-size:14px">Реальные бренды до 100.000₽. Размеры М/Ж. 3D twin с твоим лицом.</p>
+<button class="btn" onclick="go(2)">Создать образ</button>
+<div class="ticker"><span id="tickerTxt">✦ jorts + Samba ✦ indie sleaze возвращается ✦ Salomon XT-6 + baggy ✦ Our Legacy / Needles / Stüssy на Poizon ✦ washed grey + baby-blue + chrome ✦&nbsp;</span></div>
+</div>
+<div class="glass"><label><span class="live-dot"></span>LIVE ТРЕНДЫ • тикток / pinterest / poizon</label><div id="trendLive"><div class="trend">✧ загрузка живых трендов...</div></div></div>
+</div>
+
+<div id="s2" class="screen">
+<div class="glass">
+<label>1 • фото (лицо на 3D)</label>
+<div class="photoBox" onclick="document.getElementById('file').click()"><input id="file" type="file" accept="image/*" hidden><div id="phPrev">📸<br><b>Загрузить фото</b><br><small style="opacity:.7">лицо пойдет на 3D-модель</small></div></div>
+<div class="row" style="margin-top:14px"><div><label>рост <span class="val" id="hV">178</span></label><input id="h" type="range" min="150" max="210" value="178"></div><div><label>вес <span class="val" id="wV">70</span></label><input id="w" type="range" min="40" max="130" value="70"></div></div>
+<div id="bmi" style="font-size:12px;margin:6px 0;opacity:.9"></div>
+<label>пол</label><div class="chips" id="gender"><div class="chip" data-v="fem">женский</div><div class="chip active" data-v="uni">унисекс</div><div class="chip" data-v="male">мужской</div></div>
+
+<label>размер верха</label><div class="rec" id="recTop"></div><div class="chips" id="topSize"><div class="chip" data-v="XS">XS</div><div class="chip" data-v="S">S</div><div class="chip" data-v="M">M</div><div class="chip" data-v="L">L</div><div class="chip" data-v="XL">XL</div><div class="chip" data-v="XXL">XXL</div></div>
+<label>размер низа (waist)</label><div class="rec" id="recBot"></div><div class="chips" id="botSize"><div class="chip" data-v="26">26</div><div class="chip" data-v="28">28</div><div class="chip" data-v="30">30</div><div class="chip" data-v="32">32</div><div class="chip" data-v="34">34</div><div class="chip" data-v="36">36</div></div>
+<label>размер обуви EU</label><div class="rec" id="recShoe"></div><div class="chips" id="shoeSize"><div class="chip" data-v="36">36</div><div class="chip" data-v="38">38</div><div class="chip" data-v="40">40</div><div class="chip" data-v="42">42</div><div class="chip" data-v="43">43</div><div class="chip" data-v="44">44</div><div class="chip" data-v="45">45</div><div class="chip" data-v="46">46</div></div>
+
+<label>стиль</label><div class="chips" id="style">
+<div class="chip" data-v="casual">кэжуал</div><div class="chip" data-v="vintage">винтаж</div><div class="chip" data-v="indie">инди-слиз</div><div class="chip" data-v="opium">вайпер / opium</div><div class="chip" data-v="sport">спорт / gorpcore</div><div class="chip" data-v="classic">классика / old money</div><div class="chip" data-v="niche">нишевый дизайн</div>
+</div>
+<label>настроение</label><div class="chips" id="mood"><div class="chip" data-v="дерзость">дерзость</div><div class="chip" data-v="нежность">нежность</div><div class="chip" data-v="меланхолия">меланхолия</div><div class="chip" data-v="эйфория">эйфория</div><div class="chip" data-v="спокойствие">спокойствие</div><div class="chip" data-v="бунт">бунт</div></div>
+<label>лимит образа <span class="val" id="bV">60000₽</span></label><input id="budget" type="range" min="15000" max="100000" step="1000" value="60000">
+<button class="btn" style="margin-top:14px" onclick="generate()">Подобрать образ ✧</button>
+</div></div>
+
+<div id="s3" class="screen"><div class="glass load"><div class="orb"></div><h2 id="loadTxt">Сканирую Pinterest...</h2><p style="opacity:.7;font-size:13px">смотрю тикток + Poizon + считаю размеры</p></div></div>
+
+<div id="s4" class="screen">
+<div class="glass"><label>твой 3D twin • крути пальцем</label><canvas id="c3d"></canvas>
+<div id="sizeLine" style="font-size:12px;opacity:.9;margin-top:10px"></div>
+<div id="aiText" style="font-size:14px;line-height:1.6;background:rgba(0,0,0,.35);border-radius:16px;padding:14px;margin-top:12px;border:1px solid var(--stroke)"></div>
+<div id="items"></div>
+<div style="display:flex;justify-content:space-between;font-size:13px;margin-top:10px"><b id="total"></b><span id="lim"></span></div><div class="bar"><i id="barFill"></i></div>
+<div class="row" style="margin-top:14px"><button class="btn" onclick="generate(true)">↻ Ещё</button><button class="btn white" onclick="back()">Заново</button></div>
+<button class="btn" style="margin-top:10px" onclick="buyAllAvito()">Купить лук целиком на Avito ↗</button>
+<div class="row" style="margin-top:10px"><button class="btn ghost" onclick="buyAllPoizon()">Весь лук на Poizon</button><button class="btn ghost" onclick="share()">Поделиться</button></div>
+</div></div>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+let TG=window.Telegram?.WebApp; if(TG){TG.ready();TG.expand()}
+const $=id=>document.getElementById(id);
+const state={photo:null,style:null,mood:null,gender:'uni',topSize:null,botSize:null,shoeSize:null,rec:{top:'M',bot:'32',shoe:'43'}};
+window.go=n=>{document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));$('s'+n).classList.add('active');TG?.HapticFeedback?.impactOccurred('light');window.scrollTo(0,0)};
+window.back=()=>window.go(2);
+function chipInit(id,key){$(id).querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$(id).querySelectorAll('.chip').forEach(x=>x.classList.remove('active'));c.classList.add('active');state[key]=c.dataset.v;TG?.HapticFeedback?.selectionChanged();if(key==='gender')calcSizes()})}
+chipInit('style','style');chipInit('mood','mood');chipInit('gender','gender');chipInit('topSize','topSize');chipInit('botSize','botSize');chipInit('shoeSize','shoeSize');
+window.calcSizes=calcSizes;
+$('h').oninput=e=>{$('hV').innerText=e.target.value;calcSizes()};$('w').oninput=e=>{$('wV').innerText=e.target.value;calcSizes()};
+$('budget').oninput=e=>$('bV').innerText=(+e.target.value).toLocaleString('ru-RU')+'₽';
+function calcSizes(){
+let h=+$('h').value,w=+$('w').value,g=state.gender,b=w/((h/100)**2);
+let top,bot,shoe;
+if(g==='fem'){top=w<50?'XS':w<58?'S':w<68?'M':w<78?'L':'XL';bot=w<52?'26':w<60?'28':w<70?'30':w<80?'32':'34';shoe=h<160?'36':h<168?'38':h<175?'40':'41';}
+else if(g==='male'){top=w<62?'S':w<74?'M':w<87?'L':w<100?'XL':'XXL';bot=w<65?'30':w<78?'32':w<90?'34':'36';shoe=h<172?'42':h<180?'43':h<188?'44':'45';}
+else{top=w<55?'S':w<70?'M':w<85?'L':'XL';bot=w<60?'28':w<75?'32':'34';shoe=h<167?'40':h<180?'43':'44';}
+state.rec={top,bot,shoe};
+$('recTop').innerText='AI советует: '+top+(g==='fem'?' (42-50 RU)':g==='male'?' (46-54 RU)':' oversize');
+$('recBot').innerText='AI советует: W'+bot;$('recShoe').innerText='AI советует: EU '+shoe;
+$('bmi').innerText=`BMI ${b.toFixed(1)} • `+(b<19?'худощавый → оверсайз и слои':b>25?'плотный → прямой крой, темный низ, вертикаль':'средний → играем с пропорцией');
+}
+calcSizes();
+$('file').onchange=e=>{let f=e.target.files[0];let r=new FileReader();r.onload=ev=>{state.photo=ev.target.result;$('phPrev').innerHTML=`<img src="${state.photo}">`};r.readAsDataURL(f)};
+
+const DB={
+casual:{tops:[{b:'Carhartt WIP',n:'Chase Sweatshirt',p:9800,c:'#2f3d33',d:'Плотный, держит плечо'},{b:'Stüssy',n:'8 Ball Heavy Tee',p:6900,c:'#151515',d:'Тикток-база'},{b:'Uniqlo U',n:'Oversize Crew Tee',p:2990,c:'#e9e2d6',d:'Идеален под baggy'}],bottoms:[{b:'Dickies',n:'874 Original',p:7490,c:'#232323',d:'Вытягивают ноги'},{b:"Levi's",n:"501 '93 Baggy",p:12990,c:'#4a6b8a',d:'Хит Pinterest'},{b:'Weekday',n:'Astro Baggy',p:8990,c:'#1b2440',d:'Мешок с формой'}],shoes:[{b:'Adidas',n:'Samba OG',p:14999,c:'#efe8d8',d:'Топ с джинсой и jorts'},{b:'New Balance',n:'2002R',p:16990,c:'#8b8b8b',d:'Дорого выглядят'},{b:'Converse',n:'Chuck 70 Hi',p:9990,c:'#111111',d:'Под всё'}],acc:[{b:'Carhartt',n:'Watch Beanie',p:3500,c:'#3a2f2f',d:'Финал образа'}]},
+vintage:{tops:[{b:'Vintage Nike',n:'90s Wash Sweatshirt',p:6500,c:'#6b6f6b',d:'Правильная выварка'},{b:'Lacoste',n:'80s Polo',p:5900,c:'#e5e0d5',d:'Тихий люкс'},{b:'Harley Davidson',n:'Oversize Tee 00s',p:7200,c:'#1c1c1c',d:'Гранж-вайб'}],bottoms:[{b:"Levi's Vintage",n:'505 Washed',p:8200,c:'#7a8ca3',d:'Потертость как надо'},{b:'Corduroy',n:'Velour Wide Pants',p:6800,c:'#6b4d2e',d:'Фактура=ниша'}],shoes:[{b:'Asics',n:'Gel-Kayano 14',p:17200,c:'#d8d8d8',d:'Серебро Pinterest'},{b:'Reebok',n:'Classic Leather',p:9900,c:'#f0ece2',d:'Чисто и ретро'}],acc:[{b:'Casio',n:'A158 Silver',p:5990,c:'#c0c0c0',d:'Винтажный хром'}]},
+indie:{tops:[{b:'Zara',n:'Faux Leather Biker Jacket',p:15990,c:'#101010',d:'Слиз 2008'},{b:'Bootleg',n:'Band Longsleeve',p:4900,c:'#171717',d:'Принт как с Tumblr'},{b:'No Faith',n:'Sheer Striped Top',p:5200,c:'#2a2a2a',d:'Слой под куртку'}],bottoms:[{b:'Jaded London',n:'Low-Rise Jorts',p:7500,c:'#5d7896',d:'Главный хит тиктока'},{b:'Moto',n:'Ripped Skinny',p:7900,c:'#232a36',d:'Узко+объем сверху'}],shoes:[{b:'Converse',n:'Chuck High Leather',p:10990,c:'#0e0e0e',d:'Грязные кеды=тру'},{b:'Jeffrey Campbell',n:'Biker Boots',p:18500,c:'#1a1210',d:'Утяжеляют низ'}],acc:[{b:'Chrome Hearts style',n:'Cross Belt',p:4500,c:'#111111',d:'Акцент бунта'}]},
+opium:{tops:[{b:'OXYGEN',n:'Washed Hoodie Black',p:5800,c:'#0f0f0f',d:'Opium-силуэт'},{b:'DRKSHDW style',n:'Rick Tee Long',p:11900,c:'#080808',d:'Вытянутый силуэт'},{b:'Enfants style',n:'Distressed Knit',p:9800,c:'#1e1e1e',d:'Гранж-люкс'}],bottoms:[{b:'Cargo Shop',n:'Parachute Black',p:7900,c:'#121212',d:'Объем+пропорция'},{b:'Jaded',n:'Baggy Leather Pants',p:12900,c:'#1b1b1b',d:'Кожа=дерзость'}],shoes:[{b:'Salomon',n:'XT-6 Black',p:21900,c:'#0a0a0a',d:'Техно-ниша'},{b:'Nike',n:'Shox TL',p:18400,c:'#000000',d:'Хром и агрессия'}],acc:[{b:'Balenciaga style',n:'Silver Chain',p:3900,c:'#c9c9c9',d:'Металл к черному'}]},
+sport:{tops:[{b:'Adidas',n:'Adicolor Track Top',p:9900,c:'#1d3a8a',d:'Blokecore'},{b:'Nike',n:'FC Jersey',p:7500,c:'#e8e8e8',d:'Джерси из тиктока'},{b:'Puma',n:'Oversize Jersey',p:6900,c:'#b91c1c',d:'Цветной акцент'}],bottoms:[{b:'Adidas',n:'Tiro Cargo',p:8500,c:'#222222',d:'Спорт+карго'},{b:'Nike',n:'Tech Woven Pants',p:9200,c:'#2b2f2b',d:'Тянут рост'}],shoes:[{b:'Salomon',n:'XT-6 White',p:21900,c:'#e5e5e5',d:'Gorpcore №1'},{b:'Asics',n:'Gel-Venture 6',p:12900,c:'#9aa39a',d:'Беговой силуэт'}],acc:[{b:'Nike',n:'Socks + Cap',p:3500,c:'#f5f5f5',d:'Финиш'}]},
+classic:{tops:[{b:'Ralph Lauren',n:'Oxford Shirt',p:13900,c:'#eef0f5',d:'Old money база'},{b:'Massimo Dutti',n:'Wool Blazer',p:18900,c:'#2c2c34',d:'Структура плеча'},{b:'Uniqlo',n:'Cashmere Sweater',p:8990,c:'#d9c7b3',d:'Мягкость и статус'}],bottoms:[{b:'Massimo Dutti',n:'Pleated Trousers',p:9900,c:'#3a3a3a',d:'Стрелки вытягивают'},{b:'COS',n:'Wide Chinos',p:8900,c:'#c9b896',d:'Беж+крем=дорого'}],shoes:[{b:'Clarks',n:'Desert Boot',p:18900,c:'#7a5a3a',d:'Классика'},{b:'Econika',n:'Loafers',p:14900,c:'#1a1a1a',d:'Лоферы под всё'}],acc:[{b:'Casio',n:'MTP Leather Watch',p:7500,c:'#5a3e2b',d:'Тихая роскошь'}]},
+niche:{tops:[{b:'Our Legacy',n:'Box Shirt',p:22500,c:'#e7e1d3',d:'Швы наружу, крой'},{b:'Needles',n:'Track Jacket',p:18900,c:'#5b1f5b',d:'Бабочка, свои узнают'},{b:'Issey style',n:'Pleated Tee',p:8900,c:'#c2c2c2',d:'Плиссе-фактура'}],bottoms:[{b:'Our Legacy',n:'Third Cut Jeans',p:19900,c:'#2a3340',d:'Идеальный baggy'},{b:'Drew',n:'Wide Pleated Black',p:11000,c:'#131313',d:'Архитектурный низ'}],shoes:[{b:'Salomon',n:'XT-Wings 2',p:20500,c:'#3d3d3d',d:'Ниша+техно'},{b:'Margiela style',n:'Replica Sneaker',p:16500,c:'#ece7dc',d:'Тихий дизайн-код'}],acc:[{b:'COS',n:'Mini Tote',p:6900,c:'#111111',d:'Финальный штрих'}}]}
+};
+const MOODMAP={'дерзость':['#0a0a0a','#b91c1c'],'нежность':['#e9e2d6','#a9c4ff'],'меланхолия':['#6b7280','#3a3a3a'],'эйфория':['#f0abfc','#22d3ee'],'спокойствие':['#c9b896','#5b6b5b'],'бунт':['#111111','#7c3aed']};
+let lastLook=null;
+const phrases=['Сканирую Pinterest...','Смотрю тикток-тренды...','Проверяю Poizon находки...','Считаю BMI и размеры...','Строю 3D-аватар...'];
+const poizon=q=>`https://m.poizon.com/search?q=${encodeURIComponent(q)}`;
+const avito=q=>`https://www.avito.ru/all?q=${encodeURIComponent(q)}`;
+const rnd=a=>a[Math.floor(Math.random()*a.length)];
+
+window.generate=async function(){
+if(!state.style||!state.mood){alert('Выбери стиль и настроение ✧');window.go(2);return}
+window.go(3);let pi=0;let iv=setInterval(()=>{$('loadTxt').innerText=phrases[pi++%phrases.length]},700);
+await new Promise(r=>setTimeout(r,2400));clearInterval(iv);
+let h=+$('h').value,w=+$('w').value,budget=+$('budget').value;bmiCalc();
+let bmiV=w/((h/100)**2);let cat=DB[state.style];
+let pick=null,tries=0;
+while(tries++<60){let t=rnd(cat.tops),b=rnd(cat.bottoms),s=rnd(cat.shoes),a=rnd(cat.acc);let tot=t.p+b.p+s.p+a.p;if(tot<=budget){pick={t,b,s,a,tot};break}}
+if(!pick){let t=cat.tops[2],b=cat.bottoms[0],s=cat.shoes[2],a=cat.acc[0];pick={t,b,s,a,tot:t.p+b.p+s.p+a.p}}
+lastLook={...pick,h,w,bmiV};
+window.go(4);
+render(pick,budget);
+explain(pick,h,w,bmiV,budget);
+requestAnimationFrame(()=>initAvatar(pick));
+};
+function bmiCalc(){}
+function render(p,budget){
+let topSz=state.topSize||state.rec.top, botSz=state.botSize||state.rec.bot, shoeSz=state.shoeSize||state.rec.shoe;
+$('sizeLine').innerHTML=`Твой размер: верх <b>${topSz}</b> • низ W<b>${botSz}</b> • обувь EU <b>${shoeSz}</b> (${state.gender})`;
+$('items').innerHTML=[['ВЕРХ • размер '+topSz,p.t],['НИЗ • W'+botSz,p.b],['ОБУВЬ • EU '+shoeSz,p.s],['АКСЕССУАР',p.a]].map(([k,it])=>`<div class="item"><div class="dot" style="background:${it.c}"></div><div><b>${it.b} • ${k}</b><div style="font-size:13px">${it.n}</div><small>${it.d}</small><span class="price">${it.p.toLocaleString('ru-RU')}₽</span><br><a class="link pz" target="_blank" href="${poizon(it.b+' '+it.n)}">Poizon ↗</a><a class="link" target="_blank" href="${avito(it.b+' '+it.n)}">Avito ↗</a></div></div>`).join('');
+$('total').innerText='Итого '+p.tot.toLocaleString('ru-RU')+'₽';$('lim').innerText='лимит '+budget.toLocaleString('ru-RU')+'₽';$('barFill').style.width=Math.min(100,p.tot/budget*100)+'%';
+}
+async function explain(p,h,w,bmiV,budget){
+$('aiText').innerText='✧ пишу разбор образа...';
+let body=bmiV<19?'худощавый, нужен объем сверху':bmiV>25?'плотный, нужен вытянутый силуэт и темный низ':'средний, играем с пропорцией';
+let topSz=state.topSize||state.rec.top, botSz=state.botSize||state.rec.bot, shoeSz=state.shoeSize||state.rec.shoe;
+let prompt=`Ты стилист yourStylist. Рост ${h} вес ${w} (${body}), пол ${state.gender}, размеры верх ${topSz} низ ${botSz} обувь ${shoeSz}. Стиль ${state.style}, настроение ${state.mood}, бюджет ${budget}руб. Образ: ${p.t.b} ${p.t.n}, ${p.b.b} ${p.b.b}, ${p.s.b} ${p.s.n}, ${p.a.b}. Объясни за 5 предложений почему идет именно ему, как сочетается, отсылки TikTok Pinterest Poizon. Дружелюбно, на русском.`;
+try{
+let r=await fetch('https://text.pollinations.ai/'+encodeURIComponent(prompt));let t=await r.text();
+if(t&&t.length>20)$('aiText').innerText='✧ '+t.slice(0,900);
+else throw 0;
+}catch{
+$('aiText').innerText=`✧ Почему тебе: ${body}, рост ${h} вес ${w}. Размерная сетка ${state.gender}: верх ${topSz}, низ W${botSz}, обувь EU ${shoeSz} — село без перетяга и без мешка не по размеру. Верх ${p.t.b} + низ ${p.b.b} дают правильную пропорцию под твой BMI. ${p.s.b} ${p.s.n} — прямо из тиктока и подборок Poizon 2026, а ${p.a.b.toLowerCase()} делает образ нишевым. Палитра под настроение «${state.mood}». Всё влезло в ${p.tot.toLocaleString('ru-RU')}₽.`;
+}}
+window.buyAllAvito=()=>{if(!lastLook)return;let q=`${lastLook.t.b} ${lastLook.t.n} ${lastLook.b.b} ${lastLook.s.b} ${lastLook.s.n}`;let url=avito(q);TG?TG.openLink(url):window.open(url,'_blank')};
+window.buyAllPoizon=()=>{if(!lastLook)return;let q=`${lastLook.t.b} ${lastLook.s.b} ${lastLook.b.b}`;let url=poizon(q);TG?TG.openLink(url):window.open(url,'_blank')};
+window.share=()=>{let t=`Мой образ от yourStylist ✧ ${lastLook?lastLook.t.b+' + '+lastLook.b.b+' + '+lastLook.s.b+' = '+lastLook.tot+'₽':''}`;let url=`https://t.me/share/url?url=${encodeURIComponent(location.href)}&text=${encodeURIComponent(t)}`;TG?TG.openTelegramLink(url):window.open(url)};
+
+// ===== 3D =====
+let renderer,scene,camera,avatar,raf;
+function initAvatar(p){
+let cv=$('c3d');
+try{if(renderer){renderer.dispose();cancelAnimationFrame(raf)}}catch{}
+renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});
+let W=cv.clientWidth||340;renderer.setSize(W,360,false);renderer.setPixelRatio(Math.min(2,devicePixelRatio));
+scene=new THREE.Scene();camera=new THREE.PerspectiveCamera(32,W/360,.1,100);camera.position.set(0,1.3,3.2);camera.lookAt(0,1,0);
+scene.add(new THREE.AmbientLight(0xffffff,.9));
+let d=new THREE.DirectionalLight(0xffffff,1.2);d.position.set(2,4,3);scene.add(d);
+let p1=new THREE.PointLight(0xf0abfc,8,10);p1.position.set(-2,2,2);scene.add(p1);
+let p2=new THREE.PointLight(0x22d3ee,8,10);p2.position.set(2,1,2);scene.add(p2);
+let sg=new THREE.BufferGeometry(),sp=[];for(let i=0;i<200;i++)sp.push((Math.random()-.5)*10,Math.random()*4,(Math.random()-.5)*5-2);sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xc4b5fd,size:.02})));
+let g=new THREE.Mesh(new THREE.CircleGeometry(.7,32),new THREE.MeshBasicMaterial({color:0xa78bfa,transparent:true,opacity:.25}));g.rotation.x=-Math.PI/2;scene.add(g);
+avatar=new THREE.Group();scene.add(avatar);
+let hF=lastLook.h/178,wF=Math.sqrt(lastLook.w/70);
+let shoulder = state.gender==='fem'?0.85:state.gender==='male'?1.15:1;
+let hips = state.gender==='fem'?1.15:state.gender==='male'?0.9:1;
+let topM=new THREE.MeshStandardMaterial({color:p.t.c,roughness:.8}),botM=new THREE.MeshStandardMaterial({color:p.b.c,roughness:.85}),shoM=new THREE.MeshStandardMaterial({color:p.s.c,roughness:.5}),skinM=new THREE.MeshStandardMaterial({color:0xe6b08e,roughness:.6});
+function mesh(geo,mat,x,y,z){let m=new THREE.Mesh(geo,mat);m.position.set(x,y,z);avatar.add(m);return m}
+mesh(new THREE.BoxGeometry(.13,.09,.28),shoM,-.14*wF,.045,0.04);mesh(new THREE.BoxGeometry(.13,.09,.28),shoM,.14*wF,.045,0.04);
+mesh(new THREE.CapsuleGeometry(.11*wF*hips,.62*hF,6,16),botM,-.14*wF,.55*hF,0);mesh(new THREE.CapsuleGeometry(.11*wF*hips,.62*hF,6,16),botM,.14*wF,.55*hF,0);
+mesh(new THREE.CapsuleGeometry(.23*wF*shoulder,.5*hF,6,20),topM,0,1.18*hF,0);
+mesh(new THREE.CapsuleGeometry(.065,.5*hF,4,12),topM,-.32*wF*shoulder,1.18*hF,0).rotation.z=.15;mesh(new THREE.CapsuleGeometry(.065,.5*hF,4,12),topM,.32*wF*shoulder,1.18*hF,0).rotation.z=-.15;
+mesh(new THREE.CylinderGeometry(.06,.06,.1,16),skinM,0,1.58*hF,0);
+mesh(new THREE.SphereGeometry(.17,32,32),skinM,0,1.78*hF,0);
+if(state.photo){let img=new Image();img.onload=()=>{let tx=new THREE.CanvasTexture(img);let fm=new THREE.Mesh(new THREE.CircleGeometry(.125,32),new THREE.MeshBasicMaterial({map:tx,transparent:true}));fm.position.set(0,1.78*hF,.145);avatar.add(fm)};img.src=state.photo}
+avatar.position.y=-.1;
+let drag=false,px=0;cv.onpointerdown=e=>{drag=true;px=e.clientX};window.onpointerup=()=>drag=false;window.onpointermove=e=>{if(drag){avatar.rotation.y+=(e.clientX-px)*.01;px=e.clientX}};
+(function anim(){raf=requestAnimationFrame(anim);if(!drag)avatar.rotation.y+=.008;avatar.position.y=-.1+Math.sin(Date.now()/900)*.02;renderer.render(scene,camera)})();
+}
+
+// ===== LIVE TRENDS 0₽ =====
+async function loadTrends(){
+let box=$('trendLive');
+try{
+let r=await fetch('https://www.reddit.com/r/streetwear+malefashion+sneakers/hot.json?limit=10');
+let j=await r.json();
+let posts=j.data.children.map(c=>c.data.title).filter(t=>t&&t.length>10&&t.length<110).slice(0,4);
+if(posts.length){
+box.innerHTML=posts.map(t=>`<div class="trend">🔥 ${t}</div>`).join('')+`<div class="trend">✦ Poizon находки: Our Legacy Third Cut • Needles Track • Salomon XT-6 • Stüssy 8 Ball (обновлено live)</div>`;
+$('tickerTxt').innerText='✦ LIVE: '+posts.slice(0,3).join(' ✦ ')+' ✦ Poizon: Our Legacy + Needles + Salomon ✦ ';
+return;
+}else throw 0;
+}catch(e){
+try{
+// Pinterest RSS via бесплатный rss2json
+let rss=await fetch('https://api.rss2json.com/v1/api.json?rss_url='+encodeURIComponent('https://www.pinterest.com/fashionweek/style.rss')).then(r=>r.json());
+if(rss.items&&rss.items.length){
+box.innerHTML=rss.items.slice(0,4).map(it=>`<div class="trend">📌 ${it.title.slice(0,90)}</div>`).join('');
+return;
+}else throw 0;
+}catch{
+box.innerHTML=`<div class="trend">✦ TikTok now: jorts + Adidas Samba + длинные носки</div><div class="trend">✦ Pinterest now: washed grey, baby-blue, silver chrome, baggy</div><div class="trend">✦ Poizon now: Our Legacy, Needles, Stüssy, Salomon XT-6, Arc'teryx</div><div class="trend" style="opacity:.7">live-лента офлайн — показаны тренды недели (включатся сами при сети)</div>`;
+}
+}
+}
+loadTrends();
+</script>
+</body>
+</html>
